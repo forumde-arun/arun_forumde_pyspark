@@ -1,0 +1,41 @@
+Cache & Persist Code
+====================
+
+from pyspark import StorageLevel
+
+Read Loan Data From ADLS
+=========================
+df_loan = spark.read.format("csv").options(header=True,inferSchema=True).load('dbfs:/databricks-datasets/lending-club-loan-stats/LoanStats_2018Q2.csv')
+
+Records Where Loan Amount Is Greater Than 2000
+==============================================
+df_loan_filter=df_loan.filter(df_loan["loan_amnt"] > 2000)
+
+df_loan_filter.cache()->MEMORY_AND_DISK_ONLY
+
+OR
+
+df_loan_filter.persist()->MEMORY_AND_DISK_ONLY
+
+OR
+
+df_loan_filter.persist(StorageLevel.DISK_ONLY)
+
+
+
+#Calculation1
+# Groupby with home_ownership  along loan_amnt with sum()
+df_summed1=df_loan_filter.groupBy('home_ownership').sum('loan_amnt')
+
+
+
+#Calculation2
+# Groupby with verification_status  along loan_amnt with sum()
+df_summed2=df_loan_filter.groupBy('verification_status').sum('loan_amnt')
+
+
+LRU Fashion->automaticaaly remove
+
+or
+
+df.unpersist()
